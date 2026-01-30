@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Data - DataLab{% endblock %}
+
+{% block content_class %}main-content-full{% endblock %}
+
+{% block content %}
+<div class="upload-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="upload-header">
+                    <h1>Upload your data</h1>
+                    <p>Drop a CSV or Excel file to get started with analysis</p>
+                </div>
+
+                <div class="upload-box">
+                    <form action="/analyze" method="post" enctype="multipart/form-data" id="uploadForm">
+                        <div class="upload-zone" id="uploadArea">
+                            <div class="upload-content">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <h3>Drop file here</h3>
+                                <p class="text-muted">or click to browse</p>
+                                <input type="file" id="fileInput" name="file" accept=".csv,.xlsx,.xls" hidden>
+                                <label for="fileInput" class="btn btn-primary">Choose File</label>
+                                <small class="d-block mt-3 text-muted">Supports CSV, XLSX • Max 50MB</small>
+                            </div>
+                            <div class="file-selected" id="uploadAreaSelected" style="display: none;">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                <h3 id="fileName">file.csv</h3>
+                                <p class="text-muted" id="fileSize">2.5 MB</p>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="changeFile">Change</button>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-dark btn-lg" id="analyzeBtn" disabled>
+                                Analyze Data
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                        <span>Fast processing</span>
+                    </div>
+                    <div class="feature">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Secure upload</span>
+                    </div>
+                    <div class="feature">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Smart insights</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const uploadAreaSelected = document.getElementById('uploadAreaSelected');
+    const changeFileBtn = document.getElementById('changeFile');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.add('drag-active');
+        }, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.remove('drag-active');
+        }, false);
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    }, false);
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+    
+    changeFileBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        document.querySelector('.upload-content').style.display = 'flex';
+        uploadAreaSelected.style.display = 'none';
+        analyzeBtn.disabled = true;
+    });
+    
+    function handleFileSelect(file) {
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        
+        document.querySelector('.upload-content').style.display = 'none';
+        uploadAreaSelected.style.display = 'flex';
+        analyzeBtn.disabled = false;
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+</script>
+{% endblock %}

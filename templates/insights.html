@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Insights - DataLab{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar">
+    <nav class="sidebar-nav">
+        <a href="/dashboard" class="nav-item">
+            <i class="bi bi-house-door"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="/insights" class="nav-item active">
+            <i class="bi bi-lightbulb"></i>
+            <span>Insights</span>
+        </a>
+        <a href="/report" class="nav-item">
+            <i class="bi bi-file-text"></i>
+            <span>Report</span>
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/" class="nav-item">
+            <i class="bi bi-plus-circle"></i>
+            <span>New upload</span>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="container-fluid">
+        <div class="page-head">
+            <div>
+                <h2>Analysis insights</h2>
+                <p class="text-muted">AI-generated report</p>
+            </div>
+            <div>
+                <a href="/dashboard" class="btn btn-outline-dark me-2">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <button class="btn btn-dark">
+                    <i class="bi bi-download me-2"></i>Download
+                </button>
+            </div>
+        </div>
+
+        <div class="content-card insights-card">
+            <div class="insights-header">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="insights-badge">
+                        <i class="bi bi-stars"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Generated Analysis</h6>
+                        <small class="text-muted">{{ current_date|default('Today') }}</small>
+                    </div>
+                </div>
+                <span class="badge bg-success">Complete</span>
+            </div>
+
+            <div class="insights-body">
+                {% if insights_text %}
+                    {{ insights_text|safe }}
+                {% else %}
+                    <div class="empty-state py-5">
+                        <div class="spinner-border mb-3" role="status"></div>
+                        <p class="text-muted">Generating insights...</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="action-box">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <div>
+                        <h6>Regenerate</h6>
+                        <p class="text-muted mb-0">Get updated analysis</p>
+                    </div>
+                    <button class="btn btn-outline-dark btn-sm">Run</button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="action-box">
+                    <i class="bi bi-cloud-upload"></i>
+                    <div>
+                        <h6>New dataset</h6>
+                        <p class="text-muted mb-0">Upload different file</p>
+                    </div>
+                    <a href="/" class="btn btn-outline-dark btn-sm">Upload</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
