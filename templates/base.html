@@ -3,29 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Data Analyst{% endblock %}</title>
-    
+    <meta name="description" content="DataLab – AI-powered data analysis dashboard">
+    <title>{% block title %}DataLab{% endblock %}</title>
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-    <!-- Custom CSS -->
+
+    <!-- Custom CSS — linked via Flask url_for for correct static path resolution -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+
     <!-- Top Navbar -->
     <nav class="navbar navbar-light bg-white border-bottom fixed-top">
         <div class="container-fluid px-4">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
                 <span class="brand-text">DataLab</span>
             </a>
             <div class="d-flex align-items-center gap-3">
-                <a href="#" class="nav-icon">
+                <!-- Mobile sidebar toggle (hidden on desktop) -->
+                <button class="btn-sidebar-toggle d-lg-none" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <i class="bi bi-list"></i>
+                </button>
+                <a href="#" class="nav-icon" aria-label="Notifications">
                     <i class="bi bi-bell"></i>
                 </a>
-                <div class="user-avatar">JD</div>
+                <div class="user-avatar" title="User">JD</div>
             </div>
         </div>
     </nav>
@@ -33,17 +39,37 @@
     <!-- Sidebar -->
     {% block sidebar %}{% endblock %}
 
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+            <div class="flash-alert flash-{{ category }}" role="alert">
+                <i class="bi {% if category == 'danger' %}bi-exclamation-circle{% elif category == 'warning' %}bi-exclamation-triangle{% else %}bi-check-circle{% endif %}"></i>
+                {{ message }}
+                <button type="button" class="flash-close" onclick="this.parentElement.remove()" aria-label="Close">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
     <!-- Main Content -->
-    <div class="{% block content_class %}main-content{% endblock %}">
+    <div class="{% block content_class %}main-content{% endblock %}" id="mainContent">
         {% block content %}{% endblock %}
     </div>
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
+
+    <!-- Custom JS — linked via Flask url_for for correct static path resolution -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

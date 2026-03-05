@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - DataLab{% endblock %}
+{% block title %}Dashboard – DataLab{% endblock %}
 
 {% block sidebar %}
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
     <nav class="sidebar-nav">
-        <a href="/dashboard" class="nav-item active">
+        <a href="{{ url_for('analyze') }}" class="nav-item active" aria-current="page">
             <i class="bi bi-house-door"></i>
             <span>Dashboard</span>
         </a>
-        <a href="/insights" class="nav-item">
+        <a href="{{ url_for('insights') }}" class="nav-item">
             <i class="bi bi-lightbulb"></i>
             <span>Insights</span>
         </a>
-        <a href="/report" class="nav-item">
+        <a href="{{ url_for('report') }}" class="nav-item">
             <i class="bi bi-file-text"></i>
             <span>Report</span>
         </a>
     </nav>
     <div class="sidebar-footer">
-        <a href="/" class="nav-item">
+        <a href="{{ url_for('index') }}" class="nav-item">
             <i class="bi bi-plus-circle"></i>
             <span>New upload</span>
         </a>
@@ -30,52 +30,54 @@
 {% block content %}
 <div class="dashboard-wrapper">
     <div class="container-fluid">
+
+        <!-- Page Header -->
         <div class="page-head">
             <div>
-                <h2>Dataset overview</h2>
-                <p class="text-muted">Last updated today</p>
+                <h2>Dataset Overview</h2>
+                <p class="text-muted">Analysis ready</p>
             </div>
-            <button class="btn btn-outline-dark">
-                <i class="bi bi-download me-2"></i>Export
-            </button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-dark">
+                <i class="bi bi-upload me-2"></i>New Upload
+            </a>
         </div>
 
-        <!-- Stats -->
+        <!-- Stats Row -->
         <div class="stats-row">
             <div class="stat-box">
                 <div class="stat-info">
                     <span class="stat-label">Rows</span>
-                    <h3 class="stat-number">{{ rows|default('0') }}</h3>
+                    <h3 class="stat-number">{{ rows | default(0) }}</h3>
                 </div>
                 <div class="stat-icon bg-blue">
                     <i class="bi bi-table"></i>
                 </div>
             </div>
-            
+
             <div class="stat-box">
                 <div class="stat-info">
                     <span class="stat-label">Columns</span>
-                    <h3 class="stat-number">{{ columns|default('0') }}</h3>
+                    <h3 class="stat-number">{{ columns | default(0) }}</h3>
                 </div>
                 <div class="stat-icon bg-green">
                     <i class="bi bi-list-columns"></i>
                 </div>
             </div>
-            
+
             <div class="stat-box">
                 <div class="stat-info">
-                    <span class="stat-label">Missing</span>
-                    <h3 class="stat-number">{{ missing_values|default('0') }}</h3>
+                    <span class="stat-label">Missing Values</span>
+                    <h3 class="stat-number">{{ missing_values | default(0) }}</h3>
                 </div>
                 <div class="stat-icon bg-orange">
                     <i class="bi bi-exclamation-triangle"></i>
                 </div>
             </div>
-            
+
             <div class="stat-box">
                 <div class="stat-info">
-                    <span class="stat-label">Size</span>
-                    <h3 class="stat-number">{{ dataset_size|default('0 KB') }}</h3>
+                    <span class="stat-label">File Size</span>
+                    <h3 class="stat-number">{{ dataset_size | default('—') }}</h3>
                 </div>
                 <div class="stat-icon bg-purple">
                     <i class="bi bi-hdd"></i>
@@ -83,14 +85,21 @@
             </div>
         </div>
 
-        <!-- Table Preview -->
+        <!-- Data Preview Table -->
         <div class="content-card">
             <div class="card-head">
-                <h5>Data preview</h5>
+                <h5>Data Preview</h5>
                 <span class="badge">First 10 rows</span>
             </div>
             <div class="table-wrapper">
-                {{ table_data|safe }}
+                {% if table_data %}
+                {{ table_data | safe }}
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-table"></i>
+                    <p>No data preview available.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -98,20 +107,21 @@
         <div class="content-card">
             <div class="card-head">
                 <h5>Visualizations</h5>
+                <span class="badge">Auto-generated</span>
             </div>
             <div class="card-body">
                 {% if chart_paths %}
                 <div class="charts-grid">
                     {% for chart in chart_paths %}
                     <div class="chart-box">
-                        <img src="{{ chart }}" alt="Chart">
+                        <img src="{{ chart }}" alt="Generated chart" loading="lazy">
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
                 <div class="empty-state">
                     <i class="bi bi-bar-chart"></i>
-                    <p>No visualizations yet</p>
+                    <p>No numeric columns found for visualization.</p>
                 </div>
                 {% endif %}
             </div>
@@ -120,13 +130,14 @@
         <!-- CTA -->
         <div class="cta-card">
             <div>
-                <h5>Generate insights</h5>
-                <p class="text-muted mb-0">Get AI-powered analysis of your data</p>
+                <h5>Generate Insights</h5>
+                <p class="text-muted mb-0">Get AI-powered analysis of your dataset</p>
             </div>
-            <a href="/insights" class="btn btn-dark">
-                View Insights
+            <a href="{{ url_for('insights') }}" class="btn btn-dark">
+                View Insights <i class="bi bi-arrow-right ms-2"></i>
             </a>
         </div>
+
     </div>
 </div>
 {% endblock %}
